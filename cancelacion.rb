@@ -9,7 +9,7 @@ wsdl_password = "password"
 #parametros para la cancelación del CFDI
 rfc = "IAD121214B34"
 uuid = "A7A812CC-3B51-4623-A219-8F4173D061FE"
-pfx_path = 'path_file/iad121214b34.pfx'
+pfx_path = 'path_del_archivo/iad121214b34.pfx'
 bin_file = File.binread(pfx_path)
 pfx_base64 = Base64.strict_encode64(bin_file)
 pfx_password = "12345678a"
@@ -38,5 +38,10 @@ client = Savon.client(wsdl: wsdl_url, log: true)
 #hacer el llamado al metodo cancelar_cfdi
 response = client.call(:cancelar_cfdi, {"xml" => envelope})
 
-#obenter el acuse
-acuse = response.to_xml
+doc = Nokogiri::XML(response.to_xml)
+
+#obenter el acuse de cancelación
+acuse = doc.xpath("//acuse_cancelacion").text
+
+#obtener los estatus de los comprobantes cancelados
+uuids_cancelados = doc.xpath("//comprobantes_cancelados").text
