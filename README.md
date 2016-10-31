@@ -1,7 +1,7 @@
 # Ruby
 Ejemplo con la integración al Webservice de Timbox
 
-Se debera hacer uso de las URL que hacen referencia al WSDL, en cada petición realizada:
+Se deberá hacer uso de las URL que hacen referencia al WSDL, en cada petición realizada:
 
 - [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado/wsdl)
 
@@ -20,7 +20,7 @@ gem install savon
 ```
 
 ##Timbrar CFDI
-Para hacer una peticion de timbrado de un CFDI, debera enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
+Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
 ```
 cadena_xml = File.read("path_xml/example.xml")
 xml_base64 = Base64.strict_encode64(cadena_xml)
@@ -39,12 +39,12 @@ envelope = %Q^
     </soapenv:Body>
   </soapenv:Envelope>^
 ```
-Con la gema de savon crear un cliente y hacer el llamado al metodo timbrar_cfdi enviandole el envelope generado con la infomación necesaria:
+Con la gema de savon crear un cliente y hacer el llamado al método timbrar_cfdi enviándole el envelope generado con la información necesaria:
 
 ```
 client = Savon.client(wsdl: wsdl_url, log: true)
 
-#llamar el metodo timbrar
+#llamar el método timbrar
 response = client.call(:timbrar_cfdi, {"xml" => envelope})
 
 #extraer el xml timbrado desde la respuesta del WS
@@ -82,11 +82,11 @@ Crear un cliente de `Savon` para hacer la petición de cancelación al webservic
 ```
 client = Savon.client(wsdl: wsdl_url, log: true)
 
-#hacer el llamado al metodo cancelar_cfdi
+#hacer el llamado al método cancelar_cfdi
 response = client.call(:cancelar_cfdi, {"xml" => envelope})
 doc = Nokogiri::XML(response.to_xml)
 
-#obenter el acuse de cancelación
+#obtener el acuse de cancelación
 acuse = doc.xpath("//acuse_cancelacion").text
 
 #obtener los estatus de los comprobantes cancelados
