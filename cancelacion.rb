@@ -1,27 +1,27 @@
 require 'base64'
 require 'savon'
 
-#parametros para la conexión al Webservice
+# Parametros para la conexión al Webservice
 wsdl_url = "https://staging.ws.timbox.com.mx/timbrado/wsdl"
-wsdl_username = "user_name"
-wsdl_password = "password"
+usuario = "AAA010101000"
+contrasena = "h6584D56fVdBbSmmnB"
 
-#parametros para la cancelación del CFDI
-rfc = "IAD121214B34"
-uuid = "A7A812CC-3B51-4623-A219-8F4173D061FE"
-pfx_path = 'path_del_archivo/iad121214b34.pfx'
+# Parametros para la cancelación del CFDI
+rfc = "AAA010101AAA"
+uuid = "E28DBCF2-F852-4B2F-8198-CD8383891EB0"
+pfx_path = 'archivoPfx.pfx'
 bin_file = File.binread(pfx_path)
 pfx_base64 = Base64.strict_encode64(bin_file)
 pfx_password = "12345678a"
 
-#generar el Envelope para el metodo cancelar
+# Generar el Envelope para el metodo cancelar
 envelope = %Q^
 <soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
    <soapenv:Header/>
    <soapenv:Body>
     <urn:cancelar_cfdi soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
-       <username xsi:type=\"xsd:string\">#{wsdl_username}</username>
-       <password xsi:type=\"xsd:string\">#{wsdl_password}</password>
+       <username xsi:type=\"xsd:string\">#{usuario}</username>
+       <password xsi:type=\"xsd:string\">#{contrasena}</password>
        <rfcemisor xsi:type=\"xsd:string\">#{rfc}</rfcemisor>
        <uuids xsi:type=\"urn:uuids\">
           <uuid xsi:type=\"xsd:string\">#{uuid}</uuid>
@@ -32,16 +32,18 @@ envelope = %Q^
  </soapenv:Body>
 </soapenv:Envelope>^
 
-#crear un cliente de savon para hacer la conexión al WS, en produccion quital el "log: true"
+# Crear un cliente de savon para hacer la conexión al WS, en produccion quital el "log: true"
 client = Savon.client(wsdl: wsdl_url, log: true)
 
-#hacer el llamado al metodo cancelar_cfdi
-response = client.call(:cancelar_cfdi, {"xml" => envelope})
+# Hacer el llamado al metodo cancelar_cfdi
+response = client.call(:cancelar_cfdi, { "xml" => envelope })
 
-doc = Nokogiri::XML(response.to_xml)
+documento = Nokogiri::XML(response.to_xml)
 
-#obenter el acuse de cancelación
-acuse = doc.xpath("//acuse_cancelacion").text
+# Obenter el acuse de cancelación
+acuse = documento.xpath("//acuse_cancelacion").text
+puts acuse
 
-#obtener los estatus de los comprobantes cancelados
-uuids_cancelados = doc.xpath("//comprobantes_cancelados").text
+# Obtener los estatus de los comprobantes cancelados
+uuids_cancelados = documento.xpath("//comprobantes_cancelados").text
+puts uuids_cancelados

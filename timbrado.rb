@@ -1,35 +1,37 @@
 require 'base64'
 require 'savon'
 
-#parametros para conexion al Webservice (URL de Pruebas)
+# Parametros para conexion al Webservice (URL de Pruebas)
 wsdl_url = "https://staging.ws.timbox.com.mx/timbrado/wsdl"
-wsdl_username = "user_name"
-wsdl_password = "password"
+usuario = "AAA010101000"
+contrasena = "h6584D56fVdBbSmmnB"
 
-#convertir la cadena del xml en base64
-xml_base64 = Base64.strict_encode64(cadena_xml)
+archivo_xml = File.read("archivoXml.xml")
+# Convertir la cadena del xml en base64
+xml_base64 = Base64.strict_encode64(archivo_xml)
 
-#generar el Envelope
+# Generar el Envelope
 envelope = %Q^
   <soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
     <soapenv:Header/>
     <soapenv:Body>
       <urn:timbrar_cfdi soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
-        <username xsi:type=\"xsd:string\">#{wsdl_username}</username>
-        <password xsi:type=\"xsd:string\">#{wsdl_password}</password>
+        <username xsi:type=\"xsd:string\">#{usuario}</username>
+        <password xsi:type=\"xsd:string\">#{contrasena}</password>
         <sxml xsi:type=\"xsd:string\">#{xml_base64}</sxml>
     </urn:timbrar_cfdi>
     </soapenv:Body>
   </soapenv:Envelope>^
 
-#crear un cliente de savon para hacer la petición al WS, en produccion quitar el "log: true"
+# Crear un cliente de savon para hacer la petición al WS, en produccion quitar el "log: true"
 client = Savon.client(wsdl: wsdl_url, log: true)
 
-#llamar el metodo timbrar
-response = client.call(:timbrar_cfdi, {"xml" => envelope})
+# Llamar el metodo timbrar
+response = client.call(:timbrar_cfdi, { "xml" => envelope })
 
-#extraer el xml timbrado desde la respuesta del WS
-doc = Nokogiri::XML(response.to_xml)
-xml_timbrado = doc.xpath("//timbrar_cfdi_result").text
+# Extraer el xml timbrado desde la respuesta del WS
+response = response.to_hash
+xml_timbrado = response[:timbrar_cfdi_response][:timbrar_cfdi_result][:xml]
 
+puts xml_timbrado
 
