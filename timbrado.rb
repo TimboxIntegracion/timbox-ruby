@@ -2,11 +2,12 @@ require 'base64'
 require 'savon'
 
 # Parametros para conexion al Webservice (URL de Pruebas)
-wsdl_url = "https://staging.ws.timbox.com.mx/timbrado/wsdl"
+wsdl_url = "https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl"
 usuario = "AAA010101000"
 contrasena = "h6584D56fVdBbSmmnB"
 
 archivo_xml = File.read("archivoXml.xml")
+
 # Convertir la cadena del xml en base64
 xml_base64 = Base64.strict_encode64(archivo_xml)
 

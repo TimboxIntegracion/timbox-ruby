@@ -2,13 +2,13 @@ require 'base64'
 require 'savon'
 
 # Parametros para la conexión al Webservice
-wsdl_url = "https://staging.ws.timbox.com.mx/timbrado/wsdl"
+wsdl_url = "https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl"
 usuario = "AAA010101000"
 contrasena = "h6584D56fVdBbSmmnB"
 
 # Parametros para la cancelación del CFDI
 rfc = "AAA010101AAA"
-uuid = "E28DBCF2-F852-4B2F-8198-CD8383891EB0"
+uuid = "7520E61B-8D9A-476E-8EE5-2E3351A991A6"
 pfx_path = 'archivoPfx.pfx'
 bin_file = File.binread(pfx_path)
 pfx_base64 = Base64.strict_encode64(bin_file)
@@ -32,7 +32,7 @@ envelope = %Q^
  </soapenv:Body>
 </soapenv:Envelope>^
 
-# Crear un cliente de savon para hacer la conexión al WS, en produccion quital el "log: true"
+# Crear un cliente de savon para hacer la conexión al WS, en produccion quitar el "log: true"
 client = Savon.client(wsdl: wsdl_url, log: true)
 
 # Hacer el llamado al metodo cancelar_cfdi
