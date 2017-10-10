@@ -8,7 +8,7 @@ contrasena = "h6584D56fVdBbSmmnB"
 
 # Parametros para la cancelación del CFDI
 rfc = "AAA010101AAA"
-uuid = "7520E61B-8D9A-476E-8EE5-2E3351A991A6"
+uuid = "5B3CD71F-514E-4C0C-A967-74EA2618647E"
 pfx_path = 'archivoPfx.pfx'
 bin_file = File.binread(pfx_path)
 pfx_base64 = Base64.strict_encode64(bin_file)
