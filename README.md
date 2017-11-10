@@ -20,9 +20,21 @@ gem install savon
 ```
 
 ## Timbrar CFDI
+### Generacion de Sello
+Para generar el sello se necesita: la llave privada (.key) en formato PEM. También es necesario incluir el XSLT del SAT para obtener transformar el XML a la cadena original.
+
+De la cadena original se obtiene el digest y luego se utiliza el digest y la llave privada para obtener el sello. Todo esto se realiza con comandos de OpenSSL.
+
+Finalmente el sello es actualizado en el archivo XML para que pueda ser timbrado. Esto se logra mandando llamar el método de actualizarSello:
+```
+generar_sello(comprobante, path_llave, password_llave);
+```
 Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
 ```
-archivo_xml = File.read("archivoXml.xml")
+nombreArchivo ="ejemplo_cfdi_33.xml"
+...
+archivo_xml = File.read(nombreArchivo)
+archivo_xml = generar_sello(archivo_xml, llave, pass_llave)
 # Convertir la cadena del xml en base64
 xml_base64 = Base64.strict_encode64(archivo_xml)
 ```
