@@ -11,6 +11,8 @@ Para integrar el Webservice al proyecto se requiere hacer uso del modulo Base64:
 
 ```
 require 'base64'
+require 'savon'
+require 'nokogiri'
 ```
 
 También se requiere instalar la gema de [Savon](http://savonrb.com/):
@@ -20,15 +22,17 @@ gem install savon
 ```
 
 ## Timbrar CFDI
-### Generacion de Sello
-Para generar el sello se necesita: la llave privada (.key) en formato PEM. También es necesario incluir el XSLT del SAT para obtener transformar el XML a la cadena original.
+#### Generación de Sello
+Para generar el sello se necesita: la llave privada (.key) en formato PEM. También es necesario incluir el XSLT del SAT para poder transformar el XML y obtener la cadena original.
 
-De la cadena original se obtiene el digest y luego se utiliza el digest y la llave privada para obtener el sello. Todo esto se realiza con comandos de OpenSSL.
+La cadena original se utiliza para obtener el digest, usando las funciones de la librería de criptografía, luego se utiliza el digest y la llave privada para obtener el sello. Todo esto se realiza utilizando la libreria de OpenSSL y Nokogiri (manipulación de XML).
 
-Finalmente el sello es actualizado en el archivo XML para que pueda ser timbrado. Esto se logra mandando llamar el método de actualizarSello:
+Una vez generado el sello, se actualiza en el XML para que este sea codificado y enviado al servicio de timbrado.
+Esto se logra mandando llamar el método de generar_sello:
 ```
 generar_sello(comprobante, path_llave, password_llave);
 ```
+#### Timbrado
 Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
 ```
 nombreArchivo ="ejemplo_cfdi_33.xml"
@@ -53,7 +57,7 @@ envelope = %Q^
     </soapenv:Body>
   </soapenv:Envelope>^
 ```
-Con la gema de savon crear un cliente y hacer el llamado al método timbrar_cfdi enviándole el envelope generado con la información necesaria:
+Con la gema de savon crear un cliente y hacer el llamado al método timbrar_cfdi enviándo el envelope generado con la información necesaria:
 
 ```
 # Crear un cliente de savon para hacer la petición al WS, en produccion quitar el "log: true"
