@@ -8,8 +8,8 @@ contrasena = "h6584D56fVdBbSmmnB"
 
 # Parametros para la consulta de peticiones pendientes
 rfc_receptor = "AAA010101AAA"
-file_cer_pem = File.read('../CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('../CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
+file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
 
 envelope = %Q^<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
    <soapenv:Header/>
