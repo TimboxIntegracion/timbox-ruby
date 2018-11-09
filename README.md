@@ -3,9 +3,16 @@ Ejemplo con la integración al Webservice de Timbox
 
 Se deberá hacer uso de las URL que hacen referencia al WSDL, en cada petición realizada:
 
+Webservice de Timbrado:
 - [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl)
 
 - [Timbox Producción](https://sistema.timbox.com.mx/timbrado_cfdi33/wsdl)
+
+Webservice de Cancelación:
+
+- [Timbox Pruebas](https://staging.ws.timbox.com.mx/cancelacion/wsdl)
+
+- [Timbox Producción](https://sistema.timbox.com.mx/cancelacion/wsdl)
 
 Para integrar el Webservice al proyecto se requiere hacer uso del modulo Base64:
 
@@ -159,7 +166,7 @@ estatus_cancelacion = documento.xpath("//estatus_cancelacion").text
 puts estatus_cancelacion
 ```
 
-##Consultar Peticiones Pendientes
+## Consultar Peticiones Pendientes
 Para la consulta de peticiones pendientes son necesarios el certificado y llave, en formato pem que corresponde al emisor del comprobante:
 ```
 file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
