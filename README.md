@@ -86,7 +86,7 @@ Para la cancelación son necesarios el certificado y llave, en formato pem que c
 file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
 file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
 ```
-Crear en envelope para la petición de cancelación:
+Crear el envelope para la petición de cancelación:
 ```
 # Generar el Envelope para el metodo cancelar
 envelope = %Q^<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
@@ -173,7 +173,7 @@ file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
 file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
 ```
 
-Crear en envelope para la petición de consultas pendientes:
+Crear el envelope para la petición de consultas pendientes:
 ```
 envelope = %Q^<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
    <soapenv:Header/>
@@ -214,7 +214,7 @@ file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
 file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
 ```
 
-Crear en envelope para la petición de consultas pendientes:
+Crear el envelope para la petición de procesar respuestas:
 ```
 # A(Aceptar la solicitud), R(Rechazar la solicitud)
 respuesta = 'A'
