@@ -3,11 +3,11 @@ require 'nokogiri'
 
 # Parametros para la conexión al Webservice
 wsdl_url = "https://staging.ws.timbox.com.mx/cancelacion/wsdl"
-usuario = "AAA010101000"
-contrasena = "h6584D56fVdBbSmmnB"
+usuario = ""
+contrasena = ""
 
 # Parametros para la consulta de estatus del CFDI
-rfc_emisor = "AAA010101AAA"
+rfc_emisor = "IVD920810GU2"
 rfc_receptor = "IAD121214B34"
 
  # uuid con aceptacion

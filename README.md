@@ -3,10 +3,15 @@ Ejemplo con la integración al Webservice de Timbox
 
 Se deberá hacer uso de las URL que hacen referencia al WSDL, en cada petición realizada:
 
-Webservice de Timbrado:
+Webservice de Timbrado 3.3 :
 - [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl)
 
 - [Timbox Producción](https://sistema.timbox.com.mx/timbrado_cfdi33/wsdl)
+
+Webservice de Timbrado 4.0 :
+- [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado_cfdi40/wsdl)
+
+- [Timbox Producción](https://sistema.timbox.com.mx/timbrado_cfdi40/wsdl)
 
 Webservice de Cancelación:
 
@@ -30,7 +35,7 @@ gem install savon
 
 ## Timbrar CFDI
 ### Generación de Sello
-Para generar el sello se necesita: la llave privada (.key) en formato PEM y el XSLT del SAT (cadenaoriginal_3_3.xslt).El XSLT del SAT se utiliza para poder transformar el XML y obtener la cadena original.
+Para generar el sello se necesita: la llave privada (.key) en formato PEM y el XSLT del SAT (cadenaoriginal_3_3.xslt o cadenaoriginal_4_0.xslt) acoder a la versión. El XSLT del SAT se utiliza para poder transformar el XML y obtener la cadena original.
 
 La cadena original se utiliza para obtener el digest, usando las funciones de la librería de criptografía, luego se utiliza el digest y la llave privada para obtener el sello. Todo esto se realiza utilizando la libreria de OpenSSL.
 
@@ -39,7 +44,7 @@ Esto se logra mandando llamar el método de generar_sello:
 ```
 generar_sello(comprobante, path_llave, password_llave);
 ```
-### Timbrado
+### Timbrado 3.3
 Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
 ```
 nombreArchivo ="ejemplo_cfdi_33.xml"
@@ -80,11 +85,61 @@ xml_timbrado = response[:timbrar_cfdi_response][:timbrar_cfdi_result][:xml]
 puts xml_timbrado
 ```
 
+### Timbrado 4.0
+Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
+```
+nombreArchivo ="ejemplo_cfdi_40.xml"
+...
+archivo_xml = File.read(nombreArchivo)
+archivo_xml = generar_sello(archivo_xml, llave, pass_llave)
+# Convertir la cadena del xml en base64
+xml_base64 = Base64.strict_encode64(archivo_xml)
+```
+Crear el envelope de la petición SOAP en un string:
+```
+# Generar el Envelope
+envelope = %Q^
+  <soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
+    <soapenv:Header/>
+    <soapenv:Body>
+      <urn:timbrar_cfdi soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
+        <username xsi:type=\"xsd:string\">#{usuario}</username>
+        <password xsi:type=\"xsd:string\">#{contrasena}</password>
+        <sxml xsi:type=\"xsd:string\">#{xml_base64}</sxml>
+    </urn:timbrar_cfdi>
+    </soapenv:Body>
+  </soapenv:Envelope>^
+```
+Con la gema de savon se debe crear un cliente y hacer el llamado al método timbrar_cfdi enviándo el envelope generado con la información necesaria:
+
+```
+# Crear un cliente de savon para hacer la petición al WS, en produccion quitar el "log: true"
+client = Savon.client(wsdl: wsdl_url, log: true)
+
+# Llamar el metodo timbrar
+response = client.call(:timbrar_cfdi, { "xml" => envelope })
+
+# Extraer el xml timbrado desde la respuesta del WS
+response = response.to_hash
+xml_timbrado = response[:timbrar_cfdi_response][:timbrar_cfdi_result][:xml]
+
+puts xml_timbrado
+```
+
 ## Cancelar CFDI
+
+A partir del 2022 será necesario señalar el motivo de la cancelación de los comprobantes. Al seleccionar como motivo de cancelación la clave 01 “Comprobante emitido con errores con relación deberá relacionarse el folio fiscal del comprobante que sustituye al cancelado. Se actualizan los plazos para realizar la cancelación de facturas.
+
+**<b> Motivos de Cancelación (Código - Descripción) </b>**
+**<b>  01    -    Comprobante emitido con errores con relación </b>**
+**<b>  02    -    Comprobante emitido con errores sin relación </b>**
+**<b>  03    -    No se llevó a cabo la operación </b>**
+**<b>  04    -    Operación nominativa relacionada en la factura global </b>**
+
 Para la cancelación son necesarios el certificado y llave, en formato pem que corresponde al emisor del comprobante:
 ```
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 ```
 Crear el envelope para la petición de cancelación:
 ```
@@ -102,6 +157,8 @@ envelope = %Q^<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-ins
                <uuid xsi:type=\"xsd:string\">#{uuid}</uuid>
                <rfc_receptor xsi:type=\"xsd:string\">#{rfc_receptor}</rfc_receptor>
                <total xsi:type=\"xsd:string\">#{total}</total>
+               <motivo xsi:type=\"xsd:string\">#{motivo}</motivo>
+               <folio_sustituto xsi:type=\"xsd:string\">#{folio_sustituto}</folio_sustituto>
             </folio>
          </folios>
          <cert_pem xsi:type=\"xsd:string\">#{file_cer_pem}</cert_pem>
@@ -127,6 +184,7 @@ puts acuse
 uuids_cancelados = documento.xpath("//comprobantes_cancelados").text
 puts uuids_cancelados
 ```
+
 ## Consultar Estatus CFDI
 Para la consulta de estatus de CFDI solo es necesario generar la petición de consulta,
 Crear el envelope de la petición SOAP en un string:
@@ -169,8 +227,8 @@ puts estatus_cancelacion
 ## Consultar Peticiones Pendientes
 Para la consulta de peticiones pendientes son necesarios el certificado y llave, en formato pem que corresponde al receptor del comprobante:
 ```
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 ```
 
 Crear el envelope para la petición de consultas pendientes:
@@ -210,8 +268,8 @@ puts uuids
 ## Procesar Respuesta
 Para realizar la petición de aceptación/rechazo de la solicitud de cancelación son necesarios el certificado y llave, en formato pem que corresponde al receptor del comprobante:
 ```
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 ```
 
 Crear el envelope para la petición de procesar respuestas:
@@ -260,8 +318,8 @@ puts acuse
 ## Consultar Documentos Relacionados
 Para realizar la petición de consulta de documentos relacionados son necesarios el certificado y llave, en formato pem que corresponde al receptor del comprobante:
 ```
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 ```
 
 Crear el envelope para la petición de consulta:
@@ -301,42 +359,4 @@ puts uuids_padres
 # Obtener los documentos relacionados hijos
 uuids_hijos = documento.xpath("//relacionados_hijos").text
 puts uuids_hijos
-```
-
-## Validar CFDI's
-Para la validación de CFDI solo es necesario generar la petición de validar_cfdi,
-Crear el envelope de la petición SOAP en un string:
-```
-envelope = %Q^<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:WashOut">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <urn:validar_cfdi soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-         <username xsi:type="xsd:string">#{usuario}</username>
-         <password xsi:type="xsd:string">#{contrasena}</password>
-         <validar xsi:type="urn:comprobante">
-            <!--Zero or more repetitions:-->
-            <Comprobante xsi:type="urn:Comprobante">
-               <external_id xsi:type="xsd:string">#{external}</external_id>
-               <sxml xsi:type="xsd:string">#{xml}</sxml>
-            </Comprobante>
-         </validar>
-      </urn:validar_cfdi>
-   </soapenv:Body>
-</soapenv:Envelope>^
-```
-Crear un cliente de Savon para hacer la petición de validar_cfdi al webservice:
-
-```
-# Crear un cliente de savon para hacer la conexión al WS, en produccion quitar el "log: true"
-client = Savon.client(wsdl: wsdl_url, log: true)
-
-# Hacer el llamado al metodo validar_cfdi
-response = client.call(:validar_cfdi, { "xml" => envelope })
-
-documento = Nokogiri::XML(response.to_xml)
-
-# Obenter el resultado del xml
-acuse = documento.xpath("//resultados").text
-puts acuse
-
 ```

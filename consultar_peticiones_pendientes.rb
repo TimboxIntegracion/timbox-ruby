@@ -3,13 +3,13 @@ require 'nokogiri'
 
 # Parametros para la conexión al Webservice
 wsdl_url = "https://staging.ws.timbox.com.mx/cancelacion/wsdl"
-usuario = "AAA010101000"
-contrasena = "h6584D56fVdBbSmmnB"
+usuario = ""
+contrasena = ""
 
 # Parametros para la consulta de peticiones pendientes
 rfc_receptor = "AAA010101AAA"
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 
 envelope = %Q^<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
    <soapenv:Header/>

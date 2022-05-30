@@ -3,16 +3,16 @@ require 'nokogiri'
 
 # Parametros para la conexión al Webservice
 wsdl_url = "https://staging.ws.timbox.com.mx/cancelacion/wsdl"
-usuario = "AAA010101000"
-contrasena = "h6584D56fVdBbSmmnB"
+usuario = ""
+contrasena = ""
 
 # Parametros para la cancelación del CFDI
-rfc_emisor = "AAA010101AAA"
+rfc_emisor = "IVD920810GU2"
 rfc_receptor = "AAA010101AAA"
 uuid = "43234877-36A8-4E5E-8AD3-385C5D51DDC5"
 total = "1751.60"
-file_cer_pem = File.read('CSD01_AAA010101AAA.cer.pem')
-file_key_pem = File.read('CSD01_AAA010101AAA.key.pem')
+file_cer_pem = File.read('IVD920810GU2.cer.pem')
+file_key_pem = File.read('IVD920810GU2.key.pem')
 
 # A(Aceptar la solicitud), R(Rechazar la solicitud)
 respuesta = 'A'

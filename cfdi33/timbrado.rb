@@ -40,11 +40,12 @@ def actualizar_sello(comprobante, sello)
 end
 
 # Parametros para conexion al Webservice (URL de Pruebas)
-wsdl_url = "https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl"
-usuario = "AAA010101000"
-contrasena = "h6584D56fVdBbSmmnB"
+wsdl_url = "https://staging.ws.timbox.com.mx/timbrado_cfdi40/wsdl"
+usuario = ""
+contrasena = ""
+
 nombreArchivo ="ejemplo_cfdi_33.xml"
-llave = "CSD01_AAA010101AAA.key.pem"
+llave = "../IVD920810GU2.key.pem"
 pass_llave = "12345678a"
 
 archivo_xml = File.read(nombreArchivo)
