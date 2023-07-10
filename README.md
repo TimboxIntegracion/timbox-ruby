@@ -3,11 +3,6 @@ Ejemplo con la integración al Webservice de Timbox
 
 Se deberá hacer uso de las URL que hacen referencia al WSDL, en cada petición realizada:
 
-Webservice de Timbrado 3.3 :
-- [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado_cfdi33/wsdl)
-
-- [Timbox Producción](https://sistema.timbox.com.mx/timbrado_cfdi33/wsdl)
-
 Webservice de Timbrado 4.0 :
 - [Timbox Pruebas](https://staging.ws.timbox.com.mx/timbrado_cfdi40/wsdl)
 
@@ -44,46 +39,7 @@ Esto se logra mandando llamar el método de generar_sello:
 ```
 generar_sello(comprobante, path_llave, password_llave);
 ```
-### Timbrado 3.3
-Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
-```
-nombreArchivo ="ejemplo_cfdi_33.xml"
-...
-archivo_xml = File.read(nombreArchivo)
-archivo_xml = generar_sello(archivo_xml, llave, pass_llave)
-# Convertir la cadena del xml en base64
-xml_base64 = Base64.strict_encode64(archivo_xml)
-```
-Crear el envelope de la petición SOAP en un string:
-```
-# Generar el Envelope
-envelope = %Q^
-  <soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:WashOut\">
-    <soapenv:Header/>
-    <soapenv:Body>
-      <urn:timbrar_cfdi soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
-        <username xsi:type=\"xsd:string\">#{usuario}</username>
-        <password xsi:type=\"xsd:string\">#{contrasena}</password>
-        <sxml xsi:type=\"xsd:string\">#{xml_base64}</sxml>
-    </urn:timbrar_cfdi>
-    </soapenv:Body>
-  </soapenv:Envelope>^
-```
-Con la gema de savon se debe crear un cliente y hacer el llamado al método timbrar_cfdi enviándo el envelope generado con la información necesaria:
 
-```
-# Crear un cliente de savon para hacer la petición al WS, en produccion quitar el "log: true"
-client = Savon.client(wsdl: wsdl_url, log: true)
-
-# Llamar el metodo timbrar
-response = client.call(:timbrar_cfdi, { "xml" => envelope })
-
-# Extraer el xml timbrado desde la respuesta del WS
-response = response.to_hash
-xml_timbrado = response[:timbrar_cfdi_response][:timbrar_cfdi_result][:xml]
-
-puts xml_timbrado
-```
 
 ### Timbrado 4.0
 Para hacer una petición de timbrado de un CFDI, deberá enviar las credenciales asignadas, asi como el xml que desea timbrar convertido a una cadena en base64:
